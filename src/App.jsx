@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence, useScroll, useTransform, animate, useReducedMotion } from 'framer-motion';
+import { SpeedInsights } from '@vercel/speed-insights/react';
 import {
   ArrowRight,
   Layout,
@@ -1169,6 +1170,7 @@ export default function App() {
 
   return (
     <div className="bg-[#05050A] min-h-screen text-white font-sans">
+      <SpeedInsights />
       {view.name === 'home' && <Navbar />}
       <AnimatePresence mode="wait">
         {renderScene()}
