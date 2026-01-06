@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { motion, AnimatePresence, useScroll, useTransform, animate, useReducedMotion } from 'framer-motion';
 // removed external SpeedInsights import to prevent build errors
 import {
@@ -23,11 +23,10 @@ import {
   Linkedin,
   Instagram,
   Github,
-  Send // Added Send icon
+  Send
 } from 'lucide-react';
 
 // --- INTERNAL PLACEHOLDER COMPONENTS ---
-// These replace the external file imports to ensure the app runs in a single file.
 
 const Scene1 = ({ onBack }) => (
   <div className="h-screen w-full flex flex-col items-center justify-center bg-neutral-950 text-white p-4">
@@ -98,6 +97,184 @@ const VelocityProject = ({ onExit }) => (
     </div>
   </div>
 );
+
+// --- 3D GLOBE IMPLEMENTATION (Advanced with Arcs) ---
+const AestheticGlobe = () => {
+  const mountRef = useRef(null);
+
+  useEffect(() => {
+    const script = document.createElement('script');
+    script.src = 'https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js';
+    script.async = true;
+    script.onload = initGlobe;
+    document.body.appendChild(script);
+
+    let renderer, scene, camera, globe, stars, arcGroup;
+    let frameId;
+
+    // --- DATA provided by user ---
+    const colors = ["#06b6d4", "#3b82f6", "#6366f1"];
+    const sampleArcs = [
+        { order: 1, startLat: -19.885592, startLng: -43.951191, endLat: -22.9068, endLng: -43.1729, arcAlt: 0.1, color: colors[Math.floor(Math.random() * (colors.length - 1))] },
+        { order: 1, startLat: 28.6139, startLng: 77.209, endLat: 3.139, endLng: 101.6869, arcAlt: 0.2, color: colors[Math.floor(Math.random() * (colors.length - 1))] },
+        { order: 1, startLat: -19.885592, startLng: -43.951191, endLat: -1.303396, endLng: 36.852443, arcAlt: 0.5, color: colors[Math.floor(Math.random() * (colors.length - 1))] },
+        { order: 2, startLat: 1.3521, startLng: 103.8198, endLat: 35.6762, endLng: 139.6503, arcAlt: 0.2, color: colors[Math.floor(Math.random() * (colors.length - 1))] },
+        { order: 2, startLat: 51.5072, startLng: -0.1276, endLat: 3.139, endLng: 101.6869, arcAlt: 0.3, color: colors[Math.floor(Math.random() * (colors.length - 1))] },
+        { order: 2, startLat: -15.785493, startLng: -47.909029, endLat: 36.162809, endLng: -115.119411, arcAlt: 0.3, color: colors[Math.floor(Math.random() * (colors.length - 1))] },
+        { order: 3, startLat: -33.8688, startLng: 151.2093, endLat: 22.3193, endLng: 114.1694, arcAlt: 0.3, color: colors[Math.floor(Math.random() * (colors.length - 1))] },
+        { order: 3, startLat: 21.3099, startLng: -157.8581, endLat: 40.7128, endLng: -74.006, arcAlt: 0.3, color: colors[Math.floor(Math.random() * (colors.length - 1))] },
+        { order: 3, startLat: -6.2088, startLng: 106.8456, endLat: 51.5072, endLng: -0.1276, arcAlt: 0.3, color: colors[Math.floor(Math.random() * (colors.length - 1))] },
+        { order: 4, startLat: 11.986597, startLng: 8.571831, endLat: -15.595412, endLng: -56.05918, arcAlt: 0.5, color: colors[Math.floor(Math.random() * (colors.length - 1))] },
+        { order: 4, startLat: -34.6037, startLng: -58.3816, endLat: 22.3193, endLng: 114.1694, arcAlt: 0.7, color: colors[Math.floor(Math.random() * (colors.length - 1))] },
+        { order: 4, startLat: 51.5072, startLng: -0.1276, endLat: 48.8566, endLng: -2.3522, arcAlt: 0.1, color: colors[Math.floor(Math.random() * (colors.length - 1))] },
+        { order: 5, startLat: 14.5995, startLng: 120.9842, endLat: 51.5072, endLng: -0.1276, arcAlt: 0.3, color: colors[Math.floor(Math.random() * (colors.length - 1))] },
+        { order: 5, startLat: 1.3521, startLng: 103.8198, endLat: -33.8688, endLng: 151.2093, arcAlt: 0.2, color: colors[Math.floor(Math.random() * (colors.length - 1))] },
+        { order: 5, startLat: 34.0522, startLng: -118.2437, endLat: 48.8566, endLng: -2.3522, arcAlt: 0.2, color: colors[Math.floor(Math.random() * (colors.length - 1))] }
+    ];
+
+    // Helper: Lat/Lon to Vector3
+    const getPosition = (lat, lng, radius) => {
+      const phi = (90 - lat) * (Math.PI / 180);
+      const theta = (lng + 180) * (Math.PI / 180);
+      const x = -(radius * Math.sin(phi) * Math.cos(theta));
+      const z = (radius * Math.sin(phi) * Math.sin(theta));
+      const y = (radius * Math.cos(phi));
+      return new window.THREE.Vector3(x, y, z);
+    };
+
+    // Helper: Create Quadratic Bezier Curve for Arc
+    const createArc = (start, end, alt, color) => {
+      const mid = start.clone().add(end).multiplyScalar(0.5).normalize().multiplyScalar(60 * (1 + alt));
+      const curve = new window.THREE.QuadraticBezierCurve3(start, mid, end);
+      const points = curve.getPoints(50);
+      const geometry = new window.THREE.BufferGeometry().setFromPoints(points);
+      const material = new window.THREE.LineBasicMaterial({ 
+          color: color, 
+          transparent: true, 
+          opacity: 0.6,
+          linewidth: 1 
+      });
+      return new window.THREE.Line(geometry, material);
+    };
+
+    function initGlobe() {
+      if (!mountRef.current) return;
+
+      const width = mountRef.current.clientWidth;
+      const height = mountRef.current.clientHeight;
+
+      // Scene
+      scene = new window.THREE.Scene();
+      scene.fog = new window.THREE.FogExp2(0x05050a, 0.0035); // Darker fog to match bg
+
+      camera = new window.THREE.PerspectiveCamera(45, width / height, 1, 1000);
+      camera.position.z = 220;
+      camera.position.y = 50;
+
+      renderer = new window.THREE.WebGLRenderer({ alpha: true, antialias: true });
+      renderer.setSize(width, height);
+      renderer.setPixelRatio(window.devicePixelRatio);
+      mountRef.current.appendChild(renderer.domElement);
+
+      // Globe (Points)
+      const geometry = new window.THREE.IcosahedronGeometry(60, 4); // More detail
+      const material = new window.THREE.PointsMaterial({
+        color: 0x1d4ed8, // Blue-700
+        size: 1.2,
+        transparent: true,
+        opacity: 0.4,
+        sizeAttenuation: true
+      });
+      globe = new window.THREE.Points(geometry, material);
+      scene.add(globe);
+
+      // Inner Glow
+      const innerGeo = new window.THREE.IcosahedronGeometry(59, 3);
+      const innerMat = new window.THREE.MeshBasicMaterial({
+        color: 0x000000,
+      });
+      const innerGlobe = new window.THREE.Mesh(innerGeo, innerMat);
+      scene.add(innerGlobe);
+
+      // Atmosphere
+      const atmosGeo = new window.THREE.IcosahedronGeometry(60, 3);
+      const atmosMat = new window.THREE.MeshBasicMaterial({
+        color: 0x3b82f6,
+        transparent: true,
+        opacity: 0.05,
+        wireframe: true
+      });
+      const atmosphere = new window.THREE.Mesh(atmosGeo, atmosMat);
+      scene.add(atmosphere);
+
+      // Arcs
+      arcGroup = new window.THREE.Group();
+      sampleArcs.forEach(arc => {
+          const startPos = getPosition(arc.startLat, arc.startLng, 60);
+          const endPos = getPosition(arc.endLat, arc.endLng, 60);
+          const line = createArc(startPos, endPos, arc.arcAlt, arc.color);
+          arcGroup.add(line);
+      });
+      globe.add(arcGroup); // Attach arcs to globe so they rotate with it
+
+      // Stars
+      const starsGeo = new window.THREE.BufferGeometry();
+      const starsCount = 1200;
+      const posArray = new Float32Array(starsCount * 3);
+      for(let i = 0; i < starsCount * 3; i++) {
+        posArray[i] = (Math.random() - 0.5) * 1000;
+      }
+      starsGeo.setAttribute('position', new window.THREE.BufferAttribute(posArray, 3));
+      const starsMat = new window.THREE.PointsMaterial({
+        size: 1.5,
+        color: 0xffffff,
+        transparent: true,
+        opacity: 0.3
+      });
+      stars = new window.THREE.Points(starsGeo, starsMat);
+      scene.add(stars);
+
+      // Lights
+      const ambientLight = new window.THREE.AmbientLight(0xffffff, 0.2);
+      scene.add(ambientLight);
+      const pointLight = new window.THREE.PointLight(0x3b82f6, 1.5);
+      pointLight.position.set(50, 50, 50);
+      scene.add(pointLight);
+
+      // Animation
+      const animate = () => {
+        if (!globe) return;
+        globe.rotation.y += 0.001; // Slow rotation
+        atmosphere.rotation.y += 0.0012;
+        stars.rotation.y -= 0.0002;
+        
+        renderer.render(scene, camera);
+        frameId = requestAnimationFrame(animate);
+      };
+      animate();
+
+      const handleResize = () => {
+        if (!mountRef.current) return;
+        const w = mountRef.current.clientWidth;
+        const h = mountRef.current.clientHeight;
+        renderer.setSize(w, h);
+        camera.aspect = w / h;
+        camera.updateProjectionMatrix();
+      };
+      window.addEventListener('resize', handleResize);
+    }
+
+    return () => {
+      cancelAnimationFrame(frameId);
+      if (mountRef.current && renderer) {
+        mountRef.current.removeChild(renderer.domElement);
+      }
+      if (script.parentNode) script.parentNode.removeChild(script);
+    };
+  }, []);
+
+  return <div ref={mountRef} className="absolute inset-0 z-0 opacity-80" />;
+};
 
 // --- UTILS ---
 function cn(...classes) {
@@ -1148,82 +1325,120 @@ const Home = ({ onViewProject }) => {
         </div>
       </section>
 
-       <section id="contact" className="py-20 md:py-32 border-t border-white/10 bg-[#05050A] px-6">
-         <div className="max-w-4xl mx-auto text-center mb-12">
-           <h2 className="text-3xl sm:text-4xl md:text-6xl font-bold mb-6">Ready to Innovate?</h2>
-           <p className="text-lg md:text-xl text-gray-400 max-w-2xl mx-auto">Let's build something exceptional together. Fill out the form below or message us directly.</p>
-         </div>
+       {/* --- CONTACT SECTION WITH 3D GLOBE --- */}
+       <section id="contact" className="py-20 md:py-32 bg-[#05050A] relative overflow-hidden min-h-[800px] flex items-center justify-center">
+         
+         {/* 3D Globe Background */}
+         <AestheticGlobe />
+         
+         <div className="absolute inset-0 bg-gradient-to-t from-[#05050A] via-transparent to-[#05050A] pointer-events-none" />
+         
+         <div className="max-w-6xl w-full mx-auto px-6 relative z-10 grid md:grid-cols-2 gap-12 items-center">
+             
+             {/* Left Text - Shortened and Punchy */}
+             <motion.div
+                 initial={{ opacity: 0, x: -20 }}
+                 whileInView={{ opacity: 1, x: 0 }}
+                 transition={{ duration: 0.8 }}
+                 className="text-center md:text-left"
+             >
+                 <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-500/10 border border-blue-500/20 text-xs font-bold text-blue-400 mb-6 uppercase tracking-wider">
+                    Global Reach
+                 </div>
+                 <h2 className="text-4xl md:text-7xl font-bold text-white mb-6 leading-tight">
+                     Innovate <br/> <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-500">Now.</span>
+                 </h2>
+                 <p className="text-lg text-gray-400 mb-8 leading-relaxed max-w-md mx-auto md:mx-0">
+                     Elite software engineering for visionary brands.
+                 </p>
+             </motion.div>
 
-         <div className="max-w-xl mx-auto bg-[#0F0F16] border border-white/5 rounded-2xl p-6 md:p-8 shadow-2xl relative overflow-hidden">
-            {/* Form Background Gradient */}
-            <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500" />
+             {/* Right Form - Enhanced visibility */}
+             <motion.div 
+                initial={{ opacity: 0, scale: 0.95 }}
+                whileInView={{ opacity: 1, scale: 1 }}
+                transition={{ duration: 0.5, delay: 0.2 }}
+                className="bg-neutral-900/80 backdrop-blur-2xl border border-white/20 rounded-3xl p-6 md:p-8 shadow-[0_0_50px_rgba(59,130,246,0.2)] relative overflow-hidden"
+             >
+                 {/* Decorative glow */}
+                 <div className="absolute -top-20 -right-20 w-40 h-40 bg-blue-500/20 rounded-full blur-3xl pointer-events-none" />
 
-            <form onSubmit={handleSubmit} className="space-y-6 text-left relative z-10">
-                <div>
-                  <label htmlFor="name" className="block text-sm font-medium text-gray-400 mb-2">Name</label>
-                  <input 
-                    type="text" 
-                    id="name" 
-                    name="name" 
-                    required
-                    value={formState.name}
-                    onChange={handleInputChange}
-                    className="w-full bg-black/50 border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all"
-                    placeholder="John Doe"
-                  />
-                </div>
-                <div>
-                  <label htmlFor="email" className="block text-sm font-medium text-gray-400 mb-2">Email</label>
-                  <input 
-                    type="email" 
-                    id="email" 
-                    name="email" 
-                    required
-                    value={formState.email}
-                    onChange={handleInputChange}
-                    className="w-full bg-black/50 border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all"
-                    placeholder="john@example.com"
-                  />
-                </div>
-                <div>
-                  <label htmlFor="message" className="block text-sm font-medium text-gray-400 mb-2">Message</label>
-                  <textarea 
-                    id="message" 
-                    name="message" 
-                    required
-                    value={formState.message}
-                    onChange={handleInputChange}
-                    rows={4}
-                    className="w-full bg-black/50 border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all resize-none"
-                    placeholder="Tell us about your project..."
-                  />
-                </div>
-                
-                <button 
-                  type="submit" 
-                  disabled={isSubmitting}
-                  className="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-4 rounded-lg transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed group"
-                >
-                  {isSubmitting ? (
-                    <span className="animate-pulse">Sending...</span>
-                  ) : isSent ? (
-                    <span className="flex items-center gap-2 text-green-400"><CheckCircle2 className="w-5 h-5"/> Message Sent</span>
-                  ) : (
-                    <>Send Message <Send className="w-4 h-4 group-hover:translate-x-1 transition-transform" /></>
-                  )}
-                </button>
-            </form>
+                 <form onSubmit={handleSubmit} className="space-y-5 relative z-10">
+                     {/* Name */}
+                     <div>
+                         <label htmlFor="name" className="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-2">Name</label>
+                         <input
+                             type="text"
+                             id="name"
+                             name="name"
+                             required
+                             value={formState.name}
+                             onChange={handleInputChange}
+                             className="w-full bg-black/40 border border-white/10 rounded-lg px-4 py-3 text-white placeholder:text-neutral-600 focus:outline-none focus:border-blue-500/50 focus:ring-1 focus:ring-blue-500/50 transition-all duration-300"
+                             placeholder="John Doe"
+                         />
+                     </div>
+                     
+                     {/* Email */}
+                     <div>
+                         <label htmlFor="email" className="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-2">Email Address</label>
+                         <input
+                             type="email"
+                             id="email"
+                             name="email"
+                             required
+                             value={formState.email}
+                             onChange={handleInputChange}
+                             className="w-full bg-black/40 border border-white/10 rounded-lg px-4 py-3 text-white placeholder:text-neutral-600 focus:outline-none focus:border-blue-500/50 focus:ring-1 focus:ring-blue-500/50 transition-all duration-300"
+                             placeholder="john@example.com"
+                         />
+                     </div>
 
-            <div className="mt-8 pt-8 border-t border-white/10 flex flex-col items-center gap-4">
-                 <p className="text-gray-400 text-sm">Or connect instantly via</p>
-                 <a href="sms:385-416-5454" className="flex items-center gap-2 text-green-400 hover:text-green-300 transition-colors font-medium bg-green-500/10 px-6 py-3 rounded-full hover:bg-green-500/20 border border-green-500/20">
-                    <MessageCircle className="w-5 h-5" /> Contact via iMessage
-                 </a>
-            </div>
+                     {/* Message */}
+                     <div>
+                         <label htmlFor="message" className="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-2">Message</label>
+                         <textarea
+                             id="message"
+                             name="message"
+                             required
+                             value={formState.message}
+                             onChange={handleInputChange}
+                             rows={3}
+                             className="w-full bg-black/40 border border-white/10 rounded-lg px-4 py-3 text-white placeholder:text-neutral-600 focus:outline-none focus:border-blue-500/50 focus:ring-1 focus:ring-blue-500/50 transition-all duration-300 resize-none"
+                             placeholder="Tell us about your vision..."
+                         />
+                     </div>
+
+                     <div className="flex flex-col sm:flex-row gap-4 pt-4">
+                         {/* Send Email Button */}
+                         <button
+                             type="submit"
+                             disabled={isSubmitting}
+                             className="flex-1 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-bold py-3.5 px-6 rounded-lg transition-all flex items-center justify-center gap-2 shadow-lg shadow-blue-900/20 disabled:opacity-50 hover:scale-[1.02] active:scale-[0.98]"
+                         >
+                             {isSubmitting ? (
+                                 <span className="animate-pulse">Sending...</span>
+                             ) : isSent ? (
+                                 <span className="flex items-center gap-2 text-white"><CheckCircle2 className="w-4 h-4" /> Sent</span>
+                             ) : (
+                                 <>Send Email <Send className="w-4 h-4" /></>
+                             )}
+                         </button>
+
+                         {/* iMessage Button */}
+                         <a 
+                             href="sms:385-416-5454"
+                             className="flex-1 bg-white/5 border border-white/10 hover:bg-white/10 text-green-400 font-bold py-3.5 px-6 rounded-lg transition-all flex items-center justify-center gap-2 hover:scale-[1.02] active:scale-[0.98]"
+                         >
+                             <MessageCircle className="w-4 h-4" /> iMessage
+                         </a>
+                     </div>
+                 </form>
+             </motion.div>
          </div>
        </section>
 
-       <footer className="py-8 md:py-12 border-t border-white/10 bg-black text-center text-gray-500 text-xs md:text-sm">
+       <footer className="py-8 md:py-12 border-t border-white/10 bg-black text-center text-gray-500 text-xs md:text-sm relative z-10">
          <div className="max-w-7xl mx-auto px-6 flex flex-col md:flex-row justify-between items-center gap-4">
              <div className="font-bold text-white text-base md:text-lg">BluePeak Solutions</div>
              <p>© 2026 BluePeak Solutions. The New Generation.</p>
