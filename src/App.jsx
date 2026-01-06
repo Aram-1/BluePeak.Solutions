@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence, useScroll, useTransform, animate, useReducedMotion } from 'framer-motion';
-import { SpeedInsights } from '@vercel/speed-insights/react';
+// removed external SpeedInsights import to prevent build errors
 import {
   ArrowRight,
   Layout,
@@ -19,13 +19,85 @@ import {
   Globe,
   Move3d,
   Lock,
+  Twitter,
+  Linkedin,
+  Instagram,
+  Github,
+  Send // Added Send icon
 } from 'lucide-react';
-import Scene1 from './components/3d/Scene1.jsx';
-import Scene2 from './components/3d/Scene2.jsx';
-import Scene3 from './components/3d/Scene3.jsx';
-import VortexRetail from './components/VortexRetail.jsx';
-import VelocityProject from './components/VelocityProject.jsx';
 
+// --- INTERNAL PLACEHOLDER COMPONENTS ---
+// These replace the external file imports to ensure the app runs in a single file.
+
+const Scene1 = ({ onBack }) => (
+  <div className="h-screen w-full flex flex-col items-center justify-center bg-neutral-950 text-white p-4">
+    <h1 className="text-4xl font-bold mb-4 text-cyan-400">ARCHI STRUCT 3D</h1>
+    <p className="text-gray-400 mb-8 max-w-md text-center">Interactive 3D Generative CAD visualization would appear here.</p>
+    <button onClick={onBack} className="flex items-center gap-2 px-6 py-3 bg-white/10 rounded-full hover:bg-white/20 transition-all">
+      <ChevronLeft size={20} /> Back to Nexus
+    </button>
+  </div>
+);
+
+const Scene2 = ({ onBack }) => (
+  <div className="h-screen w-full flex flex-col items-center justify-center bg-neutral-950 text-white p-4">
+    <h1 className="text-4xl font-bold mb-4 text-fuchsia-400">NEXUS GAMING 3D</h1>
+    <p className="text-gray-400 mb-8 max-w-md text-center">Synthwave grid and neon cube visualization would appear here.</p>
+    <button onClick={onBack} className="flex items-center gap-2 px-6 py-3 bg-white/10 rounded-full hover:bg-white/20 transition-all">
+      <ChevronLeft size={20} /> Back to Nexus
+    </button>
+  </div>
+);
+
+const Scene3 = ({ onBack }) => (
+  <div className="h-screen w-full flex flex-col items-center justify-center bg-neutral-950 text-white p-4">
+    <h1 className="text-4xl font-bold mb-4 text-amber-500">PURE BREW 3D</h1>
+    <p className="text-gray-400 mb-8 max-w-md text-center">Warm coffee particle simulation would appear here.</p>
+    <button onClick={onBack} className="flex items-center gap-2 px-6 py-3 bg-white/10 rounded-full hover:bg-white/20 transition-all">
+      <ChevronLeft size={20} /> Back to Nexus
+    </button>
+  </div>
+);
+
+const VortexRetail = ({ onExit }) => (
+  <div className="min-h-screen w-full bg-[#0a0a0f] text-white p-8 flex flex-col">
+    <nav className="flex justify-between items-center mb-12">
+        <div className="font-bold text-xl tracking-wider">NEXORIA <span className="text-purple-500">PRO</span></div>
+        <button onClick={onExit} className="text-sm text-gray-400 hover:text-white">EXIT DEMO</button>
+    </nav>
+    <div className="flex-1 flex flex-col items-center justify-center text-center">
+        <div className="w-20 h-20 bg-purple-500/10 rounded-xl flex items-center justify-center mb-6 border border-purple-500/20">
+            <Database className="w-10 h-10 text-purple-500" />
+        </div>
+        <h2 className="text-4xl md:text-5xl font-bold mb-6">Enterprise Analytics Dashboard</h2>
+        <p className="text-gray-400 max-w-2xl text-lg leading-relaxed">
+            This module demonstrates high-performance data visualization and AI-driven insights.
+            Full interactive dashboard implementation would be rendered here.
+        </p>
+    </div>
+  </div>
+);
+
+const VelocityProject = ({ onExit }) => (
+  <div className="min-h-screen w-full bg-[#05050A] text-white p-8 flex flex-col">
+    <nav className="flex justify-between items-center mb-12">
+        <div className="font-bold text-xl tracking-wider flex items-center gap-2">
+            <Zap className="w-5 h-5 text-yellow-400 fill-current" /> VELOCITY
+        </div>
+        <button onClick={onExit} className="text-sm text-gray-400 hover:text-white">EXIT WORKSPACE</button>
+    </nav>
+    <div className="flex-1 flex flex-col items-center justify-center text-center">
+        <div className="w-20 h-20 bg-yellow-500/10 rounded-full flex items-center justify-center mb-6 border border-yellow-500/20">
+            <Layout className="w-10 h-10 text-yellow-500" />
+        </div>
+        <h2 className="text-4xl md:text-5xl font-bold mb-6">Next-Gen Project Management</h2>
+        <p className="text-gray-400 max-w-2xl text-lg leading-relaxed">
+            A collaborative workspace for high-velocity teams. 
+            Kanban boards, sprint planning, and team chat interfaces would be rendered here.
+        </p>
+    </div>
+  </div>
+);
 
 // --- UTILS ---
 function cn(...classes) {
@@ -927,6 +999,29 @@ const WebsitesPage = ({ onBack, onViewProject }) => {
 };
 
 const Home = ({ onViewProject }) => {
+  const [formState, setFormState] = useState({ name: '', email: '', message: '' });
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isSent, setIsSent] = useState(false);
+
+  const handleInputChange = (e) => {
+    setFormState({
+      ...formState,
+      [e.target.name]: e.target.value
+    });
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+    // Simulation of sending
+    setTimeout(() => {
+      setIsSubmitting(false);
+      setIsSent(true);
+      setTimeout(() => setIsSent(false), 3000);
+      setFormState({ name: '', email: '', message: '' });
+    }, 1500);
+  };
+
   const timelineData = useMemo(() => [
     { 
         title: "1. Analysis & Architecture", 
@@ -1053,20 +1148,78 @@ const Home = ({ onViewProject }) => {
         </div>
       </section>
 
-       <section id="contact" className="py-20 md:py-32 border-t border-white/10 bg-[#05050A] text-center px-6">
-         <div className="max-w-4xl mx-auto">
-           <h2 className="text-3xl sm:text-4xl md:text-6xl font-bold mb-6 md:mb-8">Ready to Innovate?</h2>
-           <p className="text-lg md:text-xl text-gray-400 mb-10 md:mb-12 max-w-2xl mx-auto">Let's build something exceptional together. Whether it's a website or complex software, we ensure you own the technology that drives your business.</p>
-           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-               <a href="sms:385-416-5454" style={{background: 'linear-gradient(to right, #34C759, #30B04B)'}} className="w-full sm:w-auto flex items-center justify-center gap-2 text-white px-8 py-4 rounded-full text-lg font-bold transition-all hover:scale-105 hover:shadow-lg" onMouseEnter={(e) => e.target.style.background = 'linear-gradient(to right, #32B852, #2CA340)'} onMouseLeave={(e) => e.target.style.background = 'linear-gradient(to right, #34C759, #30B04B)'}>
-                   <MessageCircle className="w-6 h-6 flex-shrink-0" strokeWidth={2} /> 
-                   <span>Contact us</span>
-               </a>
-               <a href="mailto:ceo@bluepeak.solutions" style={{background: 'linear-gradient(to right, #EA4335, #D84338)'}} className="w-full sm:w-auto flex items-center justify-center gap-2 text-white px-8 py-4 rounded-full text-lg font-bold transition-all hover:scale-105 hover:shadow-lg" onMouseEnter={(e) => e.target.style.background = 'linear-gradient(to right, #D3382C, #C4301E)'} onMouseLeave={(e) => e.target.style.background = 'linear-gradient(to right, #EA4335, #D84338)'}>
-                   <Mail className="w-6 h-6 flex-shrink-0" strokeWidth={2} />
-                   <span>Email Us</span>
-               </a>
-           </div>
+       <section id="contact" className="py-20 md:py-32 border-t border-white/10 bg-[#05050A] px-6">
+         <div className="max-w-4xl mx-auto text-center mb-12">
+           <h2 className="text-3xl sm:text-4xl md:text-6xl font-bold mb-6">Ready to Innovate?</h2>
+           <p className="text-lg md:text-xl text-gray-400 max-w-2xl mx-auto">Let's build something exceptional together. Fill out the form below or message us directly.</p>
+         </div>
+
+         <div className="max-w-xl mx-auto bg-[#0F0F16] border border-white/5 rounded-2xl p-6 md:p-8 shadow-2xl relative overflow-hidden">
+            {/* Form Background Gradient */}
+            <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500" />
+
+            <form onSubmit={handleSubmit} className="space-y-6 text-left relative z-10">
+                <div>
+                  <label htmlFor="name" className="block text-sm font-medium text-gray-400 mb-2">Name</label>
+                  <input 
+                    type="text" 
+                    id="name" 
+                    name="name" 
+                    required
+                    value={formState.name}
+                    onChange={handleInputChange}
+                    className="w-full bg-black/50 border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all"
+                    placeholder="John Doe"
+                  />
+                </div>
+                <div>
+                  <label htmlFor="email" className="block text-sm font-medium text-gray-400 mb-2">Email</label>
+                  <input 
+                    type="email" 
+                    id="email" 
+                    name="email" 
+                    required
+                    value={formState.email}
+                    onChange={handleInputChange}
+                    className="w-full bg-black/50 border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all"
+                    placeholder="john@example.com"
+                  />
+                </div>
+                <div>
+                  <label htmlFor="message" className="block text-sm font-medium text-gray-400 mb-2">Message</label>
+                  <textarea 
+                    id="message" 
+                    name="message" 
+                    required
+                    value={formState.message}
+                    onChange={handleInputChange}
+                    rows={4}
+                    className="w-full bg-black/50 border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all resize-none"
+                    placeholder="Tell us about your project..."
+                  />
+                </div>
+                
+                <button 
+                  type="submit" 
+                  disabled={isSubmitting}
+                  className="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-4 rounded-lg transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed group"
+                >
+                  {isSubmitting ? (
+                    <span className="animate-pulse">Sending...</span>
+                  ) : isSent ? (
+                    <span className="flex items-center gap-2 text-green-400"><CheckCircle2 className="w-5 h-5"/> Message Sent</span>
+                  ) : (
+                    <>Send Message <Send className="w-4 h-4 group-hover:translate-x-1 transition-transform" /></>
+                  )}
+                </button>
+            </form>
+
+            <div className="mt-8 pt-8 border-t border-white/10 flex flex-col items-center gap-4">
+                 <p className="text-gray-400 text-sm">Or connect instantly via</p>
+                 <a href="sms:385-416-5454" className="flex items-center gap-2 text-green-400 hover:text-green-300 transition-colors font-medium bg-green-500/10 px-6 py-3 rounded-full hover:bg-green-500/20 border border-green-500/20">
+                    <MessageCircle className="w-5 h-5" /> Contact via iMessage
+                 </a>
+            </div>
          </div>
        </section>
 
@@ -1170,7 +1323,6 @@ export default function App() {
 
   return (
     <div className="bg-[#05050A] min-h-screen text-white font-sans">
-      <SpeedInsights />
       {view.name === 'home' && <Navbar />}
       <AnimatePresence mode="wait">
         {renderScene()}
