@@ -170,7 +170,7 @@ const Modal = ({ isOpen, onClose, title, children }) => {
 
 // --- Main App ---
 
-export default function App({ onExit }) {
+export default function VelocityProject({ onExit }) {
   const [tasks, setTasks] = useState(INITIAL_TASKS);
   const [isOptimizing, setIsOptimizing] = useState(false);
   const [activeTab, setActiveTab] = useState('board');

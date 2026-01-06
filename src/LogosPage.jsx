@@ -7,70 +7,70 @@ const LOGOS_DATA = [
     id: 'lumen',
     title: "LÚMEN", 
     category: "Technology / Smart Energy", 
-    src: "src/assets/logo/logo1.png",
+    src: "/assets/logo/logo1.webp",
     description: "Startup dedicated to developing self-sustaining smart lighting systems for cities and homes."
   },
   { 
     id: 'nexoria',
     title: "NEXORIA", 
     category: "AI / Enterprise Software", 
-    src: "src/assets/logo/logo2.png",
+    src: "/assets/logo/logo2.webp",
     description: "Artificial intelligence platform designed to optimize internal processes for large enterprises."
   },
   { 
     id: 'terravia',
     title: "TERRAVIA", 
     category: "Eco Tourism", 
-    src: "src/assets/logo/logo3.png",
+    src: "/assets/logo/logo3.webp",
     description: "Company offering sustainable travel experiences and premium nature tourism."
   },
   { 
     id: 'aurix',
     title: "AURIX", 
     category: "Audio / Music Tech", 
-    src: "src/assets/logo/logo4.png",
+    src: "/assets/logo/logo4.webp",
     description: "High-fidelity audio brand specializing in premium headphones and sound devices."
   },
   { 
     id: 'vireon',
     title: "VIREON", 
     category: "Biotech / Health", 
-    src: "src/assets/logo/logo5.png",
+    src: "/assets/logo/logo5.webp",
     description: "Company focused on the research and development of advanced genetic therapies."
   },
   { 
     id: 'kalon',
     title: "KÁLON", 
     category: "Fashion / Luxury Design", 
-    src: "src/assets/logo/logo6.png",
+    src: "/assets/logo/logo6.webp",
     description: "High-end minimalist clothing brand with a focus on sustainability and timeless design."
   },
   { 
     id: 'orbita',
     title: "ORBITA", 
     category: "Aerospace / Innovation", 
-    src: "src/assets/logo/logo7.png",
+    src: "/assets/logo/logo7.webp",
     description: "Aerospace company dedicated to developing small satellites for global telecommunications."
   },
   { 
     id: 'novafood',
     title: "NOVAFOOD", 
     category: "Food / FoodTech", 
-    src: "src/assets/logo/logo8.png",
+    src: "/assets/logo/logo8.webp",
     description: "Startup developing functional and alternative plant-based food products."
   },
   { 
     id: 'sentra',
     title: "SENTRA", 
     category: "Cybersecurity", 
-    src: "src/assets/logo/logo9.png",
+    src: "/assets/logo/logo9.webp",
     description: "Firm specializing in advanced data protection and digital privacy solutions."
   },
   { 
     id: 'mythos',
     title: "MYTHOS", 
     category: "Gaming / Digital", 
-    src: "src/assets/logo/logo10.png",
+    src: "/assets/logo/logo10.webp",
     description: "Independent game studio creating narrative-driven videogames with high artistic quality."
   }
 ];

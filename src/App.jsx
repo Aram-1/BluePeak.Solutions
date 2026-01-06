@@ -26,77 +26,13 @@ import {
   Send
 } from 'lucide-react';
 
-// --- INTERNAL PLACEHOLDER COMPONENTS ---
+// Import real components
+import Scene1 from './components/3d/Scene1';
+import Scene2 from './components/3d/Scene2';
+import Scene3 from './components/3d/Scene3';
+import VelocityProject from './components/VelocityProject';
+import VortexRetail from './components/VortexRetail';
 
-const Scene1 = ({ onBack }) => (
-  <div className="h-screen w-full flex flex-col items-center justify-center bg-neutral-950 text-white p-4">
-    <h1 className="text-4xl font-bold mb-4 text-cyan-400">ARCHI STRUCT 3D</h1>
-    <p className="text-gray-400 mb-8 max-w-md text-center">Interactive 3D Generative CAD visualization would appear here.</p>
-    <button onClick={onBack} className="flex items-center gap-2 px-6 py-3 bg-white/10 rounded-full hover:bg-white/20 transition-all">
-      <ChevronLeft size={20} /> Back to Nexus
-    </button>
-  </div>
-);
-
-const Scene2 = ({ onBack }) => (
-  <div className="h-screen w-full flex flex-col items-center justify-center bg-neutral-950 text-white p-4">
-    <h1 className="text-4xl font-bold mb-4 text-fuchsia-400">NEXUS GAMING 3D</h1>
-    <p className="text-gray-400 mb-8 max-w-md text-center">Synthwave grid and neon cube visualization would appear here.</p>
-    <button onClick={onBack} className="flex items-center gap-2 px-6 py-3 bg-white/10 rounded-full hover:bg-white/20 transition-all">
-      <ChevronLeft size={20} /> Back to Nexus
-    </button>
-  </div>
-);
-
-const Scene3 = ({ onBack }) => (
-  <div className="h-screen w-full flex flex-col items-center justify-center bg-neutral-950 text-white p-4">
-    <h1 className="text-4xl font-bold mb-4 text-amber-500">PURE BREW 3D</h1>
-    <p className="text-gray-400 mb-8 max-w-md text-center">Warm coffee particle simulation would appear here.</p>
-    <button onClick={onBack} className="flex items-center gap-2 px-6 py-3 bg-white/10 rounded-full hover:bg-white/20 transition-all">
-      <ChevronLeft size={20} /> Back to Nexus
-    </button>
-  </div>
-);
-
-const VortexRetail = ({ onExit }) => (
-  <div className="min-h-screen w-full bg-[#0a0a0f] text-white p-8 flex flex-col">
-    <nav className="flex justify-between items-center mb-12">
-        <div className="font-bold text-xl tracking-wider">NEXORIA <span className="text-purple-500">PRO</span></div>
-        <button onClick={onExit} className="text-sm text-gray-400 hover:text-white">EXIT DEMO</button>
-    </nav>
-    <div className="flex-1 flex flex-col items-center justify-center text-center">
-        <div className="w-20 h-20 bg-purple-500/10 rounded-xl flex items-center justify-center mb-6 border border-purple-500/20">
-            <Database className="w-10 h-10 text-purple-500" />
-        </div>
-        <h2 className="text-4xl md:text-5xl font-bold mb-6">Enterprise Analytics Dashboard</h2>
-        <p className="text-gray-400 max-w-2xl text-lg leading-relaxed">
-            This module demonstrates high-performance data visualization and AI-driven insights.
-            Full interactive dashboard implementation would be rendered here.
-        </p>
-    </div>
-  </div>
-);
-
-const VelocityProject = ({ onExit }) => (
-  <div className="min-h-screen w-full bg-[#05050A] text-white p-8 flex flex-col">
-    <nav className="flex justify-between items-center mb-12">
-        <div className="font-bold text-xl tracking-wider flex items-center gap-2">
-            <Zap className="w-5 h-5 text-yellow-400 fill-current" /> VELOCITY
-        </div>
-        <button onClick={onExit} className="text-sm text-gray-400 hover:text-white">EXIT WORKSPACE</button>
-    </nav>
-    <div className="flex-1 flex flex-col items-center justify-center text-center">
-        <div className="w-20 h-20 bg-yellow-500/10 rounded-full flex items-center justify-center mb-6 border border-yellow-500/20">
-            <Layout className="w-10 h-10 text-yellow-500" />
-        </div>
-        <h2 className="text-4xl md:text-5xl font-bold mb-6">Next-Gen Project Management</h2>
-        <p className="text-gray-400 max-w-2xl text-lg leading-relaxed">
-            A collaborative workspace for high-velocity teams. 
-            Kanban boards, sprint planning, and team chat interfaces would be rendered here.
-        </p>
-    </div>
-  </div>
-);
 
 // --- 3D GLOBE IMPLEMENTATION (Advanced with Arcs) ---
 const AestheticGlobe = () => {
@@ -1473,12 +1409,6 @@ export default function App() {
         case 'soft':
              setView(prev => ({ name: 'softwares', project: prev.project }));
              break;
-        case 'nexoria-pro':
-             setView(prev => ({ name: 'nexoria-pro', project: prev.project }));
-             break;
-        case 'sentra-shield':
-             setView(prev => ({ name: 'velocity', project: prev.project }));
-             break;
         case 'archi':
              setView(prev => ({ name: 'scene-1', project: prev.project }));
              break;
@@ -1486,7 +1416,16 @@ export default function App() {
              setView(prev => ({ name: 'scene-2', project: prev.project }));
              break;
         case 'brew':
-             setView(prev => ({ name: 'scene-3', project: prev.project }));
+             setView(prev => ({ name: 'construction', project: prev.project }));
+             break;
+        case 'aero':
+             setView(prev => ({ name: 'construction', project: prev.project }));
+             break;
+        case 'nexoria-pro':
+             setView(prev => ({ name: 'nexoria-pro', project: prev.project }));
+             break;
+        case 'sentra-shield':
+             setView(prev => ({ name: 'velocity', project: prev.project }));
              break;
         case 'work':
              setView(prev => ({ name: 'exclusive', project: prev.project }));
