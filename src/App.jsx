@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { motion, AnimatePresence, useScroll, useTransform, animate, useReducedMotion } from 'framer-motion';
+import { Analytics } from '@vercel/analytics/react';
 // removed external SpeedInsights import to prevent build errors
 import {
   ArrowRight,
@@ -1542,6 +1543,7 @@ export default function App() {
       <AnimatePresence mode="wait">
         {renderScene()}
       </AnimatePresence>
+      <Analytics />
     </div>
   );
 }
