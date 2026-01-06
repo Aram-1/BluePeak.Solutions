@@ -834,7 +834,7 @@ const Navbar = () => {
     <nav className="fixed top-0 w-full z-50 bg-[#05050A]/90 backdrop-blur-md border-b border-white/5">
         <div className="max-w-7xl mx-auto px-6 h-16 md:h-20 flex items-center justify-between">
         <div className="flex items-center gap-2 cursor-pointer" onClick={() => window.scrollTo(0, 0)}>
-            <div className="w-3 h-3 rounded-full bg-blue-600 animate-pulse" />
+            <img src="/favicon-32x32.png" alt="BluePeak Logo" className="w-8 h-8" />
             <span className="font-bold text-white tracking-tight text-lg">BluePeak</span>
         </div>
         <div className="hidden md:flex items-center gap-8 text-sm font-medium text-gray-400">
