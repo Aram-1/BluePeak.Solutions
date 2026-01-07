@@ -833,8 +833,8 @@ const Navbar = () => {
     return (
     <nav className="fixed top-0 w-full z-50 bg-[#05050A]/90 backdrop-blur-md border-b border-white/5">
         <div className="max-w-7xl mx-auto px-6 h-16 md:h-20 flex items-center justify-between">
-        <div className="flex items-center gap-2 cursor-pointer" onClick={() => window.scrollTo(0, 0)}>
-            <img src="/favicon-32x32.png" alt="BluePeak Logo" className="w-8 h-8" />
+        <div className="flex items-center gap-3 cursor-pointer" onClick={() => window.scrollTo(0, 0)}>
+            <img src="/123lgoo.png" alt="BluePeak Logo" className="w-12 h-12 object-contain drop-shadow-lg filter brightness-110" />
             <span className="font-bold text-white tracking-tight text-lg">BluePeak</span>
         </div>
         <div className="hidden md:flex items-center gap-8 text-sm font-medium text-gray-400">
