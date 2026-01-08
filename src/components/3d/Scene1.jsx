@@ -472,8 +472,8 @@ const ArchiJournal = () => (
          </div>
          <div className="space-y-10 md:space-y-12">
             {[
-                { title: "Silence as Material: Designing for Acoustics", cat: "Theory" },
-                { title: "The Return of Brutalism in Luxury", cat: "Trend" },
+                { title: "Risk and Rigor: The Balance Between Aesthetics and Structure", cat: "Theory" },
+                { title: "Digital Monoliths: The Influence of Technology on Physical Form", cat: "Trend" },
                 { title: "Light & Shadow: Circadian Rhythms", cat: "Science" }
             ].map((art, i) => (
                 <div key={i} className="group flex flex-col md:flex-row md:items-center justify-between cursor-pointer">
